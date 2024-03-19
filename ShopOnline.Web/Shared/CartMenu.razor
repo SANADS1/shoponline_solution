@@ -1,0 +1,29 @@
+@* Added in other to prevent memory leaks (Added IDisposable)} *@
+@implements IDisposable  
+@inject IShoppingCartService shoppingCartService
+
+<a href="ShoppingCart" class="btn btn-info">
+    <i class="oi oi-card"></i>&nbsp;Cart
+    @* ReSharper disable once HeapView.BoxingAllocation *@
+    <span class="badge bg-dark">@shoppingCartItemsCount</span>
+</a>
+@code
+{
+    private int shoppingCartItemsCount = 0;
+
+    protected override void OnInitialized()
+    {
+        shoppingCartService.OnShoppingCartChanged += ShoppingCartChanged;
+    }
+
+    protected void ShoppingCartChanged(int totalQty)
+    {
+        shoppingCartItemsCount = totalQty;
+        StateHasChanged();  
+    }
+
+    void IDisposable.Dispose()
+    {
+        shoppingCartService.OnShoppingCartChanged -= ShoppingCartChanged;
+    }
+}
